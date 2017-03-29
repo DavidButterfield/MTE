@@ -68,5 +68,5 @@ See Also
    These files make up the source for MTE.  "make all" compiles the source
    into libmte.a and libmte.so.  "make install" does that and then copies the
    libraries into /lib, also copying the header files into /usr/include
-   (permission required on the destination directories for install to succeed)
+   (permission required on the destination directories for install to succeed).
 

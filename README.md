@@ -22,6 +22,7 @@ See Also
 
 ### Subdirectories
 
+<SMALL>
  include &mdash; header files for APIs implemented by MTE; also valgrind client
 <PRE>
    FILE        LinesOfCode  Contents

@@ -1,9 +1,9 @@
 # MTE
-High-Performance Multithreaded Event Engine
+### High-Performance Multithreaded Event Engine
 <BR>
 _David A. Butterfield_
 
-## Multi-Threaded Event Engine Clients
+### Multi-Threaded Event Engine Clients
 
 <P>
 <A HREF="https://davidbutterfield.github.io/usermode_compat/">
@@ -21,7 +21,7 @@ See Also
         the paper describing the SCST Usermode Adaptation:</A>
 
 <P>
-Subdirectories:
+### Subdirectories:
 
  include &mdash; header files for APIs implemented by MTE; also valgrind client
 <PRE>

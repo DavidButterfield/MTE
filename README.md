@@ -1,6 +1,5 @@
 # MTE
 ### High-Performance Multithreaded Event Engine
-<BR>
 _David A. Butterfield_
 
 ### Multi-Threaded Event Engine Clients

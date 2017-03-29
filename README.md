@@ -2,7 +2,7 @@
 ### High-Performance Multithreaded Event Engine
 _David A. Butterfield_
 
-### Multi-Threaded Event Engine Clients
+### MTE Clients
 
 <P>
 <A HREF="https://davidbutterfield.github.io/usermode_compat/">
@@ -12,15 +12,15 @@ _David A. Butterfield_
 <P>
 <A HREF="https://davidbutterfield.github.io/SCST-Usermode-Adaptation/">
          <STRONG>iSCSI-SCST Storage Server Usermode Adaptation</STRONG></A>
-        &mdash; a port of the SCST iSCSI storage server to run entirely in usermode on an unmodified Linux kernel
+        &mdash; a port of the SCST iSCSI storage server to run entirely
+        in usermode on an unmodified Linux kernel
 
 <P>
 See Also
 <A HREF="https://davidbutterfield.github.io/SCST-Usermode-Adaptation/SCST_Usermode.html">
-        the paper describing the SCST Usermode Adaptation:</A>
+        the paper describing the SCST Usermode Adaptation</A>
 
-<P>
-### Subdirectories:
+### Subdirectories
 
  include &mdash; header files for APIs implemented by MTE; also valgrind client
 <PRE>

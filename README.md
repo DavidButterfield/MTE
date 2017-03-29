@@ -1,5 +1,8 @@
 # MTE
 ### High-Performance Multithreaded Event Engine
+<SMALL>
+
+A high-performance framework for running multithreaded event-driven applications
 _David A. Butterfield_
 
 ### MTE Clients
@@ -22,7 +25,6 @@ See Also
 
 ### Subdirectories
 
-<SMALL>
  include &mdash; header files for APIs implemented by MTE; also valgrind client
 <PRE>
    FILE        LinesOfCode  Contents

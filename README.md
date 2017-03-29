@@ -1,9 +1,9 @@
 # MTE
-#### High-Performance Multithreaded Event Engine
-<SMALL>
-
-###### A framework for running multithreaded event-driven applications
+*High-Performance Multithreaded Event Engine*  
+A framework for running multithreaded event-driven applications  
 _David A. Butterfield_
+
+<SMALL>
 
 ###### MTE Clients
 

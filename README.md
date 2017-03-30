@@ -18,7 +18,7 @@ A framework for running multithreaded event-driven applications
 #### Subdirectories
 
  include &mdash; header files for APIs implemented by MTE; also valgrind client
-<PRE><SMALL>
+<SMALL><PRE>
    FILE        LinesOfCode  Contents
    ----        -----------  --------
    mtelib.h           60    API to initialize MTE
@@ -26,7 +26,7 @@ A framework for running multithreaded event-driven applications
    sys_debug.h       576    API for debugging services
    aio_service.h      81    API for storage AIO services
    valgrind.h               valgrind client interfaces
-</SMALL></PRE>
+</PRE></SMALL>
    These files define the interface between MTE and its clients.  An example
    of an MTE client is the compatibility module for running Linux kernel code
    in usermode, used by the SCST Usermode Adaptation.  Both MTE and the client

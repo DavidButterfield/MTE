@@ -11,7 +11,7 @@ A framework for running multithreaded event-driven applications
 
  + [iSCSI-SCST Storage Server Usermode Adaptation](https://github.com/DavidButterfield/SCST-Usermode-Adaptation
     "Usermode Compatibility for Linux Kernel Code (UMC)")
-    &mdash; a port of the SCST iSCSI storage server to run entirely in usermode on an unmodified Linux kernel.
+    &mdash; a port of the SCST iSCSI storage server to run entirely in usermode on an unmodified Linux kernel. &nbsp;
     [<I>Paper describing the project in detail</I>](https://davidbutterfield.github.io/SCST-Usermode-Adaptation/SCST_Usermode.html
     "Paper describing the project in detail")
 

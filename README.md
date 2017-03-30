@@ -18,7 +18,7 @@ A framework for running multithreaded event-driven applications
 #### Subdirectories
 
  include &mdash; header files for APIs implemented by MTE; also valgrind client
-<PRE>
+<PRE><SMALL>
    FILE        LinesOfCode  Contents
    ----        -----------  --------
    mtelib.h           60    API to initialize MTE
@@ -26,7 +26,7 @@ A framework for running multithreaded event-driven applications
    sys_debug.h       576    API for debugging services
    aio_service.h      81    API for storage AIO services
    valgrind.h               valgrind client interfaces
-</PRE>
+</SMALL></PRE>
    These files define the interface between MTE and its clients.  An example
    of an MTE client is the compatibility module for running Linux kernel code
    in usermode, used by the SCST Usermode Adaptation.  Both MTE and the client
@@ -38,7 +38,7 @@ A framework for running multithreaded event-driven applications
    be configured to look in some other location for the MTE header files.
 
  src &mdash; source files for the Multithreaded Engine
-<PRE>
+<PRE><SMALL>
    FILE        LinesOfCode  Contents
    ----        -----------  --------
    Makefile
@@ -56,7 +56,7 @@ A framework for running multithreaded event-driven applications
    mte_aio.c         353    AIO service implementation
    mte_aio.h         143    AIO service implementation
    mte_aio_impl.h    201    AIO service implementation
-</PRE>
+</SMALL></PRE>
    These files make up the source for MTE.  "make all" compiles the source
    into libmte.a and libmte.so.  "make install" does that and then copies the
    libraries into /lib, also copying the header files into /usr/include

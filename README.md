@@ -3,27 +3,19 @@
 A framework for running multithreaded event-driven applications  
 *David A. Butterfield*
 
-<SMALL>
+#### MTE Clients
 
-###### MTE Clients
+ + [Usermode Compatibility (UMC)](https://github.com/DavidButterfield/usermode_compat
+    "Usermode Compatibility for Linux Kernel Code (UMC)")
+    &mdash; a shim for running some Linux kernel code in usermode
 
-<P>
-<A HREF="https://davidbutterfield.github.io/usermode_compat/">
-         <STRONG>Usermode Compatibility for Linux kernel code</STRONG></A>
-        &mdash; a shim for running some Linux kernel code in usermode
+ + [iSCSI-SCST Storage Server Usermode Adaptation](https://github.com/DavidButterfield/SCST-Usermode-Adaptation
+    "Usermode Compatibility for Linux Kernel Code (UMC)")
+    &mdash; a port of the SCST iSCSI storage server to run entirely in usermode on an unmodified Linux kernel.
+   [Paper describing the project in detail](https://davidbutterfield.github.io/SCST-Usermode-Adaptation/SCST_Usermode.html
+    "Paper describing the project in detail")
 
-<P>
-<A HREF="https://davidbutterfield.github.io/SCST-Usermode-Adaptation/">
-         <STRONG>iSCSI-SCST Storage Server Usermode Adaptation</STRONG></A>
-        &mdash; a port of the SCST iSCSI storage server to run entirely
-        in usermode on an unmodified Linux kernel
-
-<P>
-See Also
-<A HREF="https://davidbutterfield.github.io/SCST-Usermode-Adaptation/SCST_Usermode.html">
-        the paper describing the SCST Usermode Adaptation</A>
-
-###### Subdirectories
+#### Subdirectories
 
  include &mdash; header files for APIs implemented by MTE; also valgrind client
 <PRE>

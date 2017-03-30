@@ -18,7 +18,8 @@ A framework for running multithreaded event-driven applications
 #### Subdirectories
 
  include &mdash; header files for APIs implemented by MTE; also valgrind client
-<SMALL><PRE>
+<SMALL>
+<PRE>
    FILE        LinesOfCode  Contents
    ----        -----------  --------
    mtelib.h           60    API to initialize MTE

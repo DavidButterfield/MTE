@@ -17,7 +17,7 @@ A framework for running multithreaded event-driven applications
 
 #### Subdirectories
 
- include &mdash; header files for APIs implemented by MTE; also valgrind client
+ **include** &mdash; header files for APIs implemented by MTE; also valgrind client
 <PRE>
    FILE        LinesOfCode  Contents
    ----        -----------  --------
@@ -37,7 +37,7 @@ A framework for running multithreaded event-driven applications
    you don't already have one there).  Alternatively the client Makefile may
    be configured to look in some other location for the MTE header files.
 
- src &mdash; source files for the Multithreaded Engine
+ **src** &mdash; source files for the Multithreaded Engine
 <PRE>
    FILE        LinesOfCode  Contents
    ----        -----------  --------

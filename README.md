@@ -5,11 +5,11 @@ A framework for running multithreaded event-driven applications
 
 #### MTE Clients
 
- + [Usermode Compatibility (UMC)](https://github.com/DavidButterfield/usermode_compat
+ + [Usermode Compatibility (UMC)](https://github.com/DavidButterfield/usermode_compat#user-content-usermode_compat
     "Usermode Compatibility for Linux Kernel Code (UMC)")
     &mdash; a shim for running some Linux kernel code in usermode
 
- + [iSCSI-SCST Storage Server Usermode Adaptation](https://github.com/DavidButterfield/SCST-Usermode-Adaptation
+ + [iSCSI-SCST Storage Server Usermode Adaptation](https://github.com/DavidButterfield/SCST-Usermode-Adaptation#user-content-scst-usermode-adaptation
     "Usermode Compatibility for Linux Kernel Code (UMC)")
     &mdash; a port of the SCST iSCSI storage server to run entirely in usermode on an unmodified Linux kernel. &nbsp;
     [<I>Paper describing the project in detail</I>](https://davidbutterfield.github.io/SCST-Usermode-Adaptation/docs/SCST_Usermode.html

@@ -26,7 +26,7 @@
 
 #define FL_STR                          __FILE__":"__stringify(__LINE__)
 
-typedef uint8_t				bool;
+typedef _Bool				bool;
 #define false				(0 == 1)
 #define true				(0 == 0)
 

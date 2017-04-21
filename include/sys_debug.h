@@ -231,6 +231,7 @@ assert_static(sizeof(void *) == 8);
 
 #endif /* !DEBUG */
 
+/* Expects (err == 0) -- works on kernel-style errnos and userland-style errnos */
 #define expect_noerr(err, fmtargs...) _expect_noerr(err, ""fmtargs)
 #define _expect_noerr(err, fmt, args...)					\
     do {									\
@@ -240,13 +241,14 @@ assert_static(sizeof(void *) == 8);
 	}									\
     } while (0)
 
+/* Expects (rc >= 0) -- works on kernel-style errnos and userland-style errnos */
 #define expect_rc(rc, call, fmtargs...) _expect_rc(rc, call, ""fmtargs)
 #define _expect_rc(rc, call, fmt, args...)					\
     do {									\
 	if (unlikely((rc) < 0)) {						\
 	    sys_warning("%s syscall: rc=%d err=%d %s "fmt,			\
 		        #call, (int)rc, rc == -1 ? errno : (int32_t)-rc,	\
-			  strerror(rc == -1 ? errno :  rc), ##args);		\
+			  strerror(rc == -1 ? errno : -rc), ##args);		\
 	}									\
     } while (0)
 

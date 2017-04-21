@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <inttypes.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -25,10 +26,6 @@
 #define __STRINGIFY(TOKEN)		#TOKEN
 
 #define FL_STR                          __FILE__":"__stringify(__LINE__)
-
-typedef _Bool				bool;
-#define false				(0 == 1)
-#define true				(0 == 0)
 
 #define PREDICT(e, p)			__builtin_expect((long)(e), (long)(p))
 #define likely(e)			PREDICT((e) != 0, true)

@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <inttypes.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -95,9 +96,6 @@ unconstify(void const * cvp)
 
 typedef int				sys_rc_t;	    /* return code from syscalls */
 #define SYS_RC_OK			0
-
-#define false                           (0 == 1)
-#define true                            (0 == 0)
 
 typedef const char                    * string_t;           /* owned dynamic string */
 typedef const char                    * sstring_t;          /* unowned or static string */

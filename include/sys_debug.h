@@ -19,10 +19,6 @@
 
 #include "sys_service.h"
 
-#ifndef DEBUG
-#define DEBUG				false	/* overridden by cc -DDEBUG=1 */
-#endif
-
 #ifndef TRACE_TOOVERBOSE
 #define TRACE_TOOVERBOSE		false
 #endif
@@ -205,7 +201,7 @@ assert_static(sizeof(void *) == 8);
 
 /** "assertion" checks are done in DEBUG builds only **/
 
-#if DEBUG
+#if defined(DEBUG) && DEBUG
 
 #define assert(condition, fmtargs...) 	    _verify((condition), #condition, ""fmtargs) 
 #define assert_eq(x, y, fmtargs...) 	    _verify_eq((x), (y), #x, #y, ""fmtargs)
@@ -253,7 +249,7 @@ assert_static(sizeof(void *) == 8);
     } while (0)
 
 /** Below "expect" checks are done in DEBUG builds only **/
-#if DEBUG
+#if defined(DEBUG) && DEBUG
 
 /* returns true, or warns if condition is zero */
 #define expect(condition, fmtargs...) _expect((condition), #condition, ""fmtargs)

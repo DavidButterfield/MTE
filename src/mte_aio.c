@@ -297,7 +297,7 @@ sys_aio_fopen(int fd, sys_aio_cfg_t const cfg, sstring_t const logname)
 	struct stat zero_statbuf;
 	rc = stat("/dev/zero", &zero_statbuf);
 	if (rc == 0 && statbuf.st_rdev == zero_statbuf.st_rdev) { /* /dev/zero */
-	    backing_size = 1ull << 50;	/* BIG */
+	    backing_size = 1ull << 40;	/* 1 TB */
 	}
     }
 

@@ -64,8 +64,8 @@ CFLAGS += -g -fPIC -D_GNU_SOURCE $(MTE_CFLAGS)
 
 ############################################################
 
-MTE_LDFLAGS    +=     -d -z now -O 1
-MTE_GCCLDFLAGS += -Wl,-d,-z,now,-O,1
+MTE_LDFLAGS    +=     -d -z now -O 1 -E
+MTE_GCCLDFLAGS += -Wl,-d,-z,now,-O,1,-E
 
 SRCS_D = mte_service.c mte_event_task.c mte_mem.c mte_util.c mte_debug.c mtelib_aio.c mte_aio.c
 OBJS_D = $(SRCS_D:.c=.o)
@@ -90,7 +90,7 @@ libmte.a: .depend $(OBJS_D)
 	$(LD) $(MTE_LDFLAGS) -r -o $@ $(OBJS_D)
 
 libmte.so:.depend $(OBJS_D)
-	gcc $(MTE_GCCLDFLAGS) -fPIC -shared -o $@ $(OBJS_D) -lpthread -laio -ldl -lfuse -lc
+	gcc $(MTE_GCCLDFLAGS) -fPIC -shared -o $@ $(OBJS_D) -lpthread -laio -ldl -lc
 
 ifeq (.depend,$(wildcard .depend))
 -include .depend

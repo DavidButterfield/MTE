@@ -44,14 +44,14 @@ export EXTRA_CFLAGS
 # MTE_CFLAGS += -DVALGRIND	    # Enable special program behavior for valgrind
 # MTE_CFLAGS += -DNVALGRIND	    # Disable compiling valgrind hooks in program
 
-# MTE_CFLAGS += -DDEBUG
+MTE_CFLAGS += -DDEBUG
 # MTE_CFLAGS += -DTRACE_TRACE
 # MTE_CFLAGS += -DTRACE_VERBOSE
 
-MTE_CFLAGS += -O3 -fno-strict-aliasing	#XXX
-# MTE_CFLAGS += -O2
+MTE_CFLAGS += -Og
 # MTE_CFLAGS += -O1
-# MTE_CFLAGS += -O0
+# MTE_CFLAGS += -O2
+# MTE_CFLAGS += -O3 -fno-strict-aliasing	#XXX
 
 # MTE_CFLAGS += -DOPTIMIZED	# disable most of the memory checks remaining when !DEBUG
 

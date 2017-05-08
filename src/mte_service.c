@@ -99,15 +99,18 @@ static void *
 sys_thread_fn(void * env)
 {
     sys_stack_end = (uintptr_t)&env + 0x1000;	    //XXXX
-
+    assert_eq(sys_thread, NULL);
     sys_thread = env;
+
+    assert_eq(sys_thread->tid, 0);
+    assert_eq(sys_thread->pthread_id, NULL);
+    assert_eq(sys_thread->dob, 0);
     sys_thread->tid = gettid();
     sys_thread->pthread_id = pthread_self();
     sys_thread->dob = NOW();
 
     sys_notice("thread %s @%p starts up on tid=%u",
-	       sys_thread_name(sys_thread_current()), sys_thread,
-	       sys_thread_num(sys_thread_current()));
+	       sys_thread_name(sys_thread_current()), sys_thread, gettid());
 
     if (sys_thread->name) {
 	strncpy(sys_pthread_name, sys_thread->name, sizeof(sys_pthread_name)-1);
@@ -159,6 +162,10 @@ THREAD_start(sys_thread_t thread)
     rc = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     expect_noerr(rc, "pthread_attr_setdetachstate");
     pthread_t pthread_id;
+
+    sys_notice("thread %s @%p on tid=%u CREATES NEW THREAD %s @%p",
+	       sys_thread_name(sys_thread_current()), sys_thread,
+	       gettid(), thread->name, thread);
 
     rc = pthread_create(&pthread_id, &attr, sys_thread_fn, thread);
     if (rc != 0) return -errno;

@@ -560,7 +560,7 @@ _sys_fifo_append_chain(sys_fifo_t * const fifo_dst, sys_link_t * const f,
 #if DEBUG
     count_t check_nitems = 0;
     sys_link_t * curr = f;
-    sys_link_t * prev;
+    sys_link_t * prev = NULL;
     while (curr) {
 	++check_nitems;
 	prev = curr;
@@ -709,8 +709,8 @@ sys_fifo_xfer(sys_fifo_t * const fifo_dst, sys_fifo_t * const fifo_src)
      */
     if (unlikely(fifo_src->nitem == 0)) return 0;	/* source fifo empty -- nothing to do */
 
-    sys_link_t * f;			/* first new entry from fifo_src */
-    sys_link_t * l;			/* last new entry from fifo_src */
+    sys_link_t * f = NULL;		/* first new entry from fifo_src */
+    sys_link_t * l = NULL;		/* last new entry from fifo_src */
     count_t nitems_xfer;
 
     /* Source appeared non-empty -- lock it and grab whatever we find there after locking */

@@ -14,7 +14,7 @@ WFLAGS_WARN += -Wjump-misses-init
 WFLAGS_WARN += -Wcast-align
 WFLAGS_WARN += -Wold-style-definition 
 WFLAGS_WARN += -Wredundant-decls
-WFLAGS_WARN += -Wbad-function-cast
+# WFLAGS_WARN += -Wbad-function-cast
 WFLAGS_WARN += -Wmissing-declarations
 WFLAGS_WARN += -Wmissing-prototypes
 WFLAGS_WARN += -Wnested-externs
@@ -45,6 +45,9 @@ export EXTRA_CFLAGS
 # MTE_CFLAGS += -DNVALGRIND	    # Disable compiling valgrind hooks in program
 
 MTE_CFLAGS += -DDEBUG
+# MTE_CFLAGS += -DNDEBUG
+
+MTE_CFLAGS += -fsanitize=undefined
 # MTE_CFLAGS += -DTRACE_TRACE
 # MTE_CFLAGS += -DTRACE_VERBOSE
 
@@ -52,13 +55,12 @@ MTE_CFLAGS += -Og
 # MTE_CFLAGS += -O1
 # MTE_CFLAGS += -O2
 # MTE_CFLAGS += -O3 -fno-strict-aliasing	#XXX
-
 # MTE_CFLAGS += -DOPTIMIZED	# disable most of the memory checks remaining when !DEBUG
 
 # If the services and mte headers are not in /usr/include, this is where they are
 EXTRA_INCLUDE =	../include
 
-MTE_CFLAGS += -I$(EXTRA_INCLUDE)
+MTE_CFLAGS += -I$(EXTRA_INCLUDE) $(EXTRA_CFLAGS)
 
 CFLAGS += -g -fPIC -D_GNU_SOURCE $(MTE_CFLAGS)
 
@@ -90,7 +92,9 @@ libmte.a: .depend $(OBJS_D)
 	$(LD) $(MTE_LDFLAGS) -r -o $@ $(OBJS_D)
 
 libmte.so:.depend $(OBJS_D)
-	gcc $(MTE_GCCLDFLAGS) -fPIC -shared -o $@ $(OBJS_D) -lpthread -laio -ldl -lc
+	gcc $(MTE_GCCLDFLAGS) -fPIC -shared -o $@ $(OBJS_D) -lpthread -laio -ldl \
+		-L/usr/lib/x86_64-linux-gnu -lubsan \
+		-lc \
 
 ifeq (.depend,$(wildcard .depend))
 -include .depend

@@ -144,6 +144,12 @@ typedef union {
     uintptr_t		    u64;
 } mem_alloc_union_t;
 
+#if !defined(__i386__) && !defined(__x86_64__)
+#warning XXX unaligned access, endian dependency
+#endif
+static inline __attribute__((__no_sanitize_undefined__)) uint64_t
+_get_unaligned_64(void const * p) { return (*(uint64_t const *)p); }
+
 /* Check the pattern in nbytes of END-aligned memory starting at ptr --
  * nbytes may be zero -- the specified memory area must END on an 8-byte boundary;
  * returns false if a deviation from the pattern is seen; true if OK.
@@ -161,11 +167,10 @@ mem_check_endaligned(uint8_t * const ptr, uint8_t const val, llen_t const nbytes
 	if (unlikely(nbytes_at_start > nbytes)) {
 	    nbytes_at_start = nbytes;	/* avoid exceeding a tiny nbytes */
 	}
-#if !defined(__i386__) && !defined(__x86_64__)
-        #warning XXX unaligned access, endian dependency
-#endif
-	uint64_t mask = (1 << (nbytes_at_start*8) ) - 1; /* nbytes low bytes of 0xff */
-	if ((*p.p64 & mask) != (val64 & mask)) return false;
+	/* mask for the nbytes low bytes of 0xff */
+	uint64_t mask = ((uint64_t)1 << (nbytes_at_start*8) ) - 1;
+
+	if ((_get_unaligned_64(p.p64) & mask) != (val64 & mask)) return false;
 	p.p8 += nbytes_at_start;
     }
 

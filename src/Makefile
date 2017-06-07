@@ -74,13 +74,16 @@ OBJS_D = $(SRCS_D:.c=.o)
 
 LIBS = libmte.a libmte.so
 
-all: $(LIBS)
+all: $(LIBS) cscope.out
 	@echo "***** use 'make install' or manually install shared library and include files (permission required) *****"
 
 install: $(LIBS)
 	$(MAKE) -C . /lib/libmte.so
 	$(MAKE) -C . /lib/libmte.a
 	cp $(EXTRA_INCLUDE)/*.h /usr/include
+
+cscope:	cscope.out
+
 
 /lib/libmte.so:	libmte.so
 	cp $< $@
@@ -106,8 +109,17 @@ endif
 .depend:
 	$(CC) -M $(CFLAGS) $(SRCS_D) >$(@)
 
-clean:
+cleanish:
+	rm -f *.o .depend
+
+clean: cleanish
 	rm -f *.o $(LIBS) .depend
 
 extraclean: clean
 	rm -f *.orig *.rej tags cscope.out
+
+cscope.out:
+	@cscope -b -c -R -s..
+	@ctags        -R   ..
+
+.PHONY:	all install clean extraclean cscope

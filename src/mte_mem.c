@@ -326,9 +326,9 @@ _mem_free_oversize(mem_hdr_t const hdr, llen_t const size_req, sstring_t const c
 static inline len_t
 mem_alloc_align_default(len_t const size)
 {
-    if (size < MEM_ALIGN_SECTOR)    return MEM_ALIGN_MIN;
-    if (size < MEM_ALIGN_MAX)	    return MEM_ALIGN_SECTOR;
-				    return MEM_ALIGN_MAX;
+    if (size < MEM_ALIGN_SECTOR) return MEM_ALIGN_MIN;
+    if (size < MEM_ALIGN_MAX) return MEM_ALIGN_SECTOR;
+    return MEM_ALIGN_MAX;
 }
 
 mem_arena_t

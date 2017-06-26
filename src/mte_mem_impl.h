@@ -465,7 +465,7 @@ mem_buf_size_total(llen_t const size, llen_t const align, bool const redzone)
     if (align >= MEM_ALIGN_MAX)	    return ROUNDUP(size+512, MEM_ALIGN_MAX);
     if (align >= MEM_ALIGN_SECTOR)  return ROUNDUP(size+512, MEM_ALIGN_SECTOR);
     if (size  >= MEM_ALIGN_MAX)     return ROUNDUP(size+512, MEM_ALIGN_SECTOR);
-				    return ROUNDUP(size+64,  MEM_ALIGN_MIN);
+    return ROUNDUP(size+64,  MEM_ALIGN_MIN);
 }
 
 /***** Primordial Allocator *****/

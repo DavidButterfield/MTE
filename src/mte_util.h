@@ -69,7 +69,7 @@ sys_time_t SYS_TIME_NOW;    /* time as of last inquiry -- only for debugging obs
 #define MTE_time_now() ({							\
     struct timespec _t;								\
     int const _rc_ = clock_gettime(CLOCK_MONOTONIC, &_t);			\
-    expect_rc(_rc_, clock_gettime,);						\
+    expect_rc(_rc_, clock_gettime);						\
     SYS_TIME_NOW = (sys_time_t)(_t.tv_sec*1L*1000*1000*1000 + _t.tv_nsec);	\
 })
 

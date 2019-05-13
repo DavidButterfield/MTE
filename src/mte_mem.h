@@ -72,27 +72,29 @@ void mem_init(void);
 #ifndef ARENA_DISABLE
 #define ARENA_DISABLE false
 #endif
+
 #if ARENA_DISABLE		/* Only true for special testing */
 				/* (in which case mem_hold isn't quite right) */
+
 #define mem_alloc(size_req)			mem_zero(mem_alloc_uninit(size_req), (size_req))
 #define mem_alloc_callerid(size_req, id)	mem_zero(mem_alloc_uninit(size_req), (size_req))
+#define mem_realloc_callerid(oaddr, nsize, whence)  posix_realloc((oaddr), (nsize))
 #define mem_alloc_uninit(size_req)		posix_alloc(size_req)
 #define mem_alloc_uninit_callerid(size_req, id)	posix_alloc(size_req)
 #define mem_free(buf, size_req)			posix_free((buf), (size_req))
 #define mem_free_callerid(buf, size_req, id)	posix_free((buf), (size_req))
 #define mem_drop(buf)				posix_drop(buf)
 #define mem_drop_callerid(buf, id)		posix_drop(buf)
-#define mem_hold(buf, ofs, len)			({ \
-	    buf_t const _newbuf = mem_alloc_uninit((ofs)+(len)); \
-	    memcpy(_newbuf, (buf), (ofs)+(len)); \
-	    _newbuf; \
-	})
+
 #define mem_check(buf)				do { } while (0)
 #define mem_fmt(buf)				do { } while (0)
 #define mem_stats()				sstring_copy("No mem_stats with ARENA_DISABLE")
 #define mem_bounds_check(buf, ofs, nbytes)	do { } while (0)
 #define mem_cache_alloc_uninit(cache)		mem_alloc_uninit((cache)->buf_size)
 #define mem_buf_allocator_set(buf, whence)	do { } while (0)
+
+#define mem_hold(buf) sys_panic("cannot hold buffer %p when arenas are disabled", buf);
+
 #else
 
 // XXX FIX COMMENT
@@ -132,8 +134,8 @@ void mem_init(void);
 #define mem_free_callerid(buf, size_req, id)	_mem_free((buf), (size_req), (id))
 
 /* These operate on any buffer allocated with a mem_hdr_t (no cache needed, e.g. oversize) */
-#define mem_hold(buf)			buf_hold((buf), 0, mem_buf_size_inuse(buf))
-#define buf_hold(buf, ofs, len)		ASSUME_ALIGNED( \
+#define mem_hold(buf)			buf_hold(buf)
+#define buf_hold(buf)			ASSUME_ALIGNED( \
 					    mem_hdr_refhold(mem_hdr_of_buf(buf), FL_STR), \
 					    MEM_ALIGN_MIN)
 #define mem_drop(buf)			mem_free((buf), mem_buf_size_inuse(buf))
@@ -157,7 +159,9 @@ void mem_init(void);
 		mem_hdr_to_buf(_mem_cache_alloc((cache), (cache)->buf_size, FL_STR)), \
 	        MEM_ALIGN_MIN)
 
-#define mem_buf_allocator_set(buf, whence)  _mem_buf_allocator_set((buf), (whence))	
+/* Attribute the allocation to a static caller_id string */
+extern void _mem_buf_allocator_set(void * buf, sstring_t caller_id);
+#define mem_buf_allocator_set(buf, caller_id) _mem_buf_allocator_set((buf), (caller_id))
 
 #endif
 

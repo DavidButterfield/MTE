@@ -41,7 +41,7 @@ export EXTRA_CFLAGS
 
 ############################################################
 
-# MTE_CFLAGS += -DVALGRIND	    # Enable special program behavior for valgrind
+# MTE_CFLAGS += -DVALGRIND -DARENA_DISABLE    # Enable special program behavior for valgrind
 # MTE_CFLAGS += -DNVALGRIND	    # Disable compiling valgrind hooks in program
 
 MTE_CFLAGS += -DDEBUG
@@ -51,7 +51,7 @@ MTE_CFLAGS += -fsanitize=undefined
 # MTE_CFLAGS += -DTRACE_TRACE
 # MTE_CFLAGS += -DTRACE_VERBOSE
 
-MTE_CFLAGS += -Og
+# MTE_CFLAGS += -Og
 # MTE_CFLAGS += -O1
 # MTE_CFLAGS += -O2
 # MTE_CFLAGS += -O3 -fno-strict-aliasing	#XXX
@@ -62,7 +62,7 @@ EXTRA_INCLUDE =	../include
 
 MTE_CFLAGS += -I$(EXTRA_INCLUDE) $(EXTRA_CFLAGS)
 
-CFLAGS += -g -fPIC -D_GNU_SOURCE $(MTE_CFLAGS)
+CFLAGS += -g -fPIC -fno-omit-frame-pointer -D_GNU_SOURCE $(MTE_CFLAGS)
 
 ############################################################
 

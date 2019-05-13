@@ -112,20 +112,35 @@ mem_check_aligned_words(uint64_t const * const ptr_in,
     switch (n_oddwords) {
     default:
     case 15: error |= *(ptr+14) != pattern64;
+						/* falls through */
     case 14: error |= *(ptr+13) != pattern64;
+						/* falls through */
     case 13: error |= *(ptr+12) != pattern64;
+						/* falls through */
     case 12: error |= *(ptr+11) != pattern64;
+						/* falls through */
     case 11: error |= *(ptr+10) != pattern64;
+						/* falls through */
     case 10: error |= *(ptr+9)  != pattern64;
+						/* falls through */
     case 9:  error |= *(ptr+8)  != pattern64;
+						/* falls through */
     case 8:  error |= *(ptr+7)  != pattern64;
+						/* falls through */
     case 7:  error |= *(ptr+6)  != pattern64;
+						/* falls through */
     case 6:  error |= *(ptr+5)  != pattern64;
+						/* falls through */
     case 5:  error |= *(ptr+4)  != pattern64;
+						/* falls through */
     case 4:  error |= *(ptr+3)  != pattern64;
+						/* falls through */
     case 3:  error |= *(ptr+2)  != pattern64;
+						/* falls through */
     case 2:  error |= *(ptr+1)  != pattern64;
+						/* falls through */
     case 1:  error |= *(ptr+0)  != pattern64;
+						/* falls through */
     case 0: break;
     }
 
@@ -506,6 +521,12 @@ posix_free(void const * const ptr, llen_t const nbytes)
     posix_drop(ptr);
 }
 
+static inline void *
+posix_realloc(void * oaddr, size_t nsize)
+{
+    return realloc(oaddr, nsize);   //XXX alignment?
+}
+
 /***** Memory allocation header -- keeps refcount and debugging info for each buffer *****/
 
 /* Backing allocator for mem_hdr allocations (and frees, in the case of uncached allocations) */
@@ -588,13 +609,6 @@ mem_hdr_to_buf(mem_hdr_t const hdr)
     assert_ptr(hdr);
     assert(IS_CACHE_ALIGNED(hdr), "%p", hdr);
     return (buf_t)hdr + MEM_HDR_SIZE;
-}
-
-static always_inline void
-_mem_buf_allocator_set(void const * const buf, sstring_t const caller_id)
-{
-    mem_hdr_t const hdr = mem_hdr_of_buf(buf);
-    hdr->alloc_caller = caller_id;
 }
 
 static always_inline void
@@ -789,7 +803,7 @@ mem_hdr_set_allocated(mem_hdr_t const hdr, llen_t const size_req, sstring_t cons
  * raw posix memory allocator implementation may do the copy mentioned here.
  */
 static inline buf_t
-mem_hdr_refhold(mem_hdr_t const hdr, sstring_t const caller_id)
+mem_hdr_refhold(mem_hdr_t hdr, sstring_t caller_id)
 {
     mem_hdr_check_allocated(hdr);   /* ensure in good allocated-state */
     int32_t const nrefs = int32mt_inc(&hdr->refcount);
@@ -799,6 +813,14 @@ mem_hdr_refhold(mem_hdr_t const hdr, sstring_t const caller_id)
     return mem_hdr_to_buf(hdr);
 }
 
+static inline void
+mem_hdr_set_freed(mem_hdr_t hdr, sstring_t caller_id)
+{
+    hdr->free_tasknum = sys_thread_num(sys_thread);
+    hdr->free_caller = caller_id;
+    hdr->free_seqno = int64mt_inc(&mem_hdr_seqno);
+}
+    
 /* Decrement the buffer's refcount and transition to free-state if it has reached zero --
  *
  * If hdr->pattern is set, pattern_len is the SURPLUS size (in bytes) ending at the end of the
@@ -833,9 +855,7 @@ mem_hdr_refdrop(mem_hdr_t const hdr, sstring_t const caller_id)
 
     /* Set the header fields to reflect the buffer moving into free-state
 			       (leaving hdr->size_inuse as debugging information) */
-    hdr->free_tasknum = sys_thread_num(sys_thread);
-    hdr->free_caller = caller_id;
-    hdr->free_seqno = int64mt_inc(&mem_hdr_seqno);
+    mem_hdr_set_freed(hdr, caller_id);
 
     /* Check whether or not we are writing a free-pattern... */
     if (mem_alloc_pattern_enabled()) {
@@ -858,7 +878,7 @@ mem_hdr_refdrop(mem_hdr_t const hdr, sstring_t const caller_id)
 /***** memory freelist cache -- caches one size of free buffers *****/
 
 /* Return a header and its buffer TO THE BACKING ALLOCATOR */
-void mem_hdr_free(mem_hdr_t const hdr);
+void mem_hdr_free(mem_hdr_t const hdr, sstring_t caller_id);
 
 /* Allocate a NEW aligned buffer and its header FROM THE BACKING ALLOCATOR --
  * the header is initialized to free-state; the buffer itself remains UNinitialized */
@@ -950,7 +970,7 @@ _mem_cache_free(mem_hdr_t const hdr, llen_t const size_req, sstring_t const call
 
 #ifdef VALGRIND
     /* Always free back to backing allocator under valgrind */
-    mem_hdr_free(hdr);
+    mem_hdr_free(hdr, caller_id);
     int32mt_dec(&cache->nexist);
 #else
     /* Return the buffer to its cache */

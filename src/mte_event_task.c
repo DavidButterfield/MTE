@@ -819,7 +819,7 @@ mte_event_task_run(sys_event_task_t const event_task)
     sigset_t fd_sig;
     sigemptyset(&fd_sig);
     sigaddset(&fd_sig, SIGINT);
-    sigaddset(&fd_sig, SIGQUIT);
+//  sigaddset(&fd_sig, SIGQUIT);    //XXX
     err = pthread_sigmask(SIG_BLOCK, &fd_sig, NULL);
     expect_noerr(err, "pthread_sigmask SIG_BLOCK");
 
@@ -902,7 +902,7 @@ mte_event_task_alloc(sys_event_task_cfg_t const cfg)
     sigset_t fd_sig;
     sigemptyset(&fd_sig);
     sigaddset(&fd_sig, SIGINT);
-    sigaddset(&fd_sig, SIGQUIT);
+//  sigaddset(&fd_sig, SIGQUIT);    //XXX
     int sig_fd = signalfd(-1, &fd_sig, SFD_NONBLOCK|SFD_CLOEXEC);
 
     trace("sig_fd=%d", sig_fd);

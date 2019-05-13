@@ -16,6 +16,13 @@ int64mt_t mem_hdr_seqno; /* debugging observability -- sequence number for alloc
 
 /***** Memory allocation header -- keeps refcount, stat, and diagnostic information *****/
 
+void
+_mem_buf_allocator_set(void * buf, sstring_t caller_id)
+{
+    mem_hdr_t const hdr = mem_hdr_of_buf(buf);
+    hdr->alloc_caller = caller_id;
+}
+
 /* Allocate a NEW aligned buffer and its header FROM THE BACKING ALLOCATOR --
  * the header is initialized to free-state; the buffer itself remains UNinitialized
  */
@@ -57,7 +64,7 @@ mem_hdr_alloc(llen_t const buf_size, llen_t const buf_align)
 
 /* Return a header and its buffer TO THE BACKING ALLOCATOR */
 void
-mem_hdr_free(mem_hdr_t const hdr)
+mem_hdr_free(mem_hdr_t const hdr, sstring_t caller_id)
 {
     assert_eq(hdr->magic, MEM_HDR_MAGIC);
     hdr->magic = 0xDEAD;
@@ -72,6 +79,8 @@ mem_hdr_free(mem_hdr_t const hdr)
 
     /* Check the pattern in the unused memory (if any) just before the header */
     mem_check_aligned_words(orig_alloc, MEM_PATTERN_GAP, buf_align - MEM_HDR_SIZE);
+
+    mem_hdr_set_freed(hdr, caller_id);
 
     mem_hdr_backfree(orig_alloc, total_size);
 }
@@ -219,7 +228,7 @@ mem_cache_destroy(mem_cache_t const cache)
 	if (hdr->destructing) {
 	    /* We marked this allocation to be freed -- free it */
 	    assert_eq(int32mt_get(&hdr->refcount), 0);
-	    mem_hdr_free(hdr);
+	    mem_hdr_free(hdr, FL_STR);
 	    ++ndestructed;
 	    int32mt_dec(&cache->nexist);
 	} else {
@@ -259,7 +268,8 @@ mem_cache_destroy(mem_cache_t const cache)
     /* All the cache's buffers have been freed -- free the cache */
     sys_freelist_deinit(&cache->freelist);
     sys_fifo_deinit(&cache->mem_hdr_list);
-    mem_hdr_free(mem_hdr_of_buf(cache));    /* free the cache structure itself */
+
+    mem_hdr_free(mem_hdr_of_buf(cache), FL_STR);    /* free the cache structure itself */
 
     return true;		/* Freed the cache and all its buffers */
 }
@@ -311,7 +321,7 @@ _mem_free_oversize(mem_hdr_t const hdr, llen_t const size_req, sstring_t const c
 	sys_notice("Oversize hdr=%p size_req=%"PRIu64" refs=%u -- %s",
 		   hdr, size_req, hdr->refcount.i, caller_id);
 #endif
-	mem_hdr_free(hdr);
+	mem_hdr_free(hdr, caller_id);
 	mem_arena_t const arena = my_arena();
 	assert(arena);
 	int32mt_inc(&arena->oversize.nfrees);
@@ -380,7 +390,7 @@ mem_arena_destroy(mem_arena_t const arena)
     }
 
     if (ok) {
-	mem_hdr_free(mem_hdr_of_buf(arena));    /* free the arena structure itself */
+	mem_hdr_free(mem_hdr_of_buf(arena), FL_STR);	/* free the arena structure itself */
 	sys_notice("Successfully destroyed arena\n");
 	return E_OK;
     }
@@ -413,6 +423,15 @@ mem_arena_fmt(mem_arena_t const arena)
 	    int32mt_get(&arena->oversize.nallocs), int32mt_get(&arena->oversize.nfrees), nopen);
 
     return ret;
+}
+
+void mem_arena_dump(void);
+void
+mem_arena_dump(void)
+{
+    string_t stat_str = mem_stats();
+    write(2, stat_str, strlen(stat_str));
+    string_free(stat_str);
 }
 
 #if !ARENA_DISABLE

@@ -16,6 +16,12 @@
 #include "mte_mttypes.h"
 #include "mte_mem.h"
 
+#define MTE_EVENT_DEBUG 1
+#if MTE_EVENT_DEBUG
+/* Observability of active polls under gdb */
+struct sys_poll_entry * polls_active[4096];
+#endif
+
 static mem_cache_t MTE_sched_cache;
 static mem_cache_t MTE_alarm_cache;
 static mem_cache_t MTE_poll_cache;
@@ -290,6 +296,14 @@ mte_poll_enable(sys_event_task_t event_task, void (*fn)(void *, uintptr_t, errno
 
     int32mt_inc(&event_task->npolls);
 
+#if MTE_EVENT_DEBUG
+    if (polls_active[pe->fd]) {
+	sys_warning("Thread %d enables polling by event thread %d of fd=%d already polled by thread %d",
+			gettid(), event_task->tid, pe->fd, pe->cb.owner->tid);
+    }
+    polls_active[pe->fd] = pe;
+#endif
+
     trace_verbose("ENABLE events=0x%"PRIx64" on '%s' fd=%d on event_task '%s' [%u] ",
 		  events, pe->name, fd,
 		  sys_event_task_name(event_task), sys_event_task_num(event_task));
@@ -327,6 +341,10 @@ _mte_poll_disable_sync(sys_event_task_t event_task, sys_poll_entry_t pe)
 		  sys_event_task_name(event_task), sys_event_task_num(event_task));
 
     mte_event_task_sync(event_task, __func__);		/* ensure out of callback */
+
+#if MTE_EVENT_DEBUG
+    polls_active[pe->fd] = NULL;
+#endif
 
     int32mt_dec(&event_task->npolls);
 }

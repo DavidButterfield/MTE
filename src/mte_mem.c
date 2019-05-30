@@ -106,7 +106,8 @@ static inline void
 _buf_info(buf_t const buf, sstring_t const msg1, sstring_t const msg2)
 {
     mem_hdr_t const hdr = mem_hdr_of_buf(buf);
-    sys_eprintf("%s %s hdr/buf=%p/%p "MEM_HDR_FMT"\n", msg1, msg2, hdr, hdr+1, MEM_HDR_FIELDS(hdr));
+    sys_eprintf("%s %s hdr/buf=%p/%p "MEM_HDR_FMT" seqno_now=%"PRIu64"\n",
+		msg1, msg2, hdr, hdr+1, MEM_HDR_FIELDS(hdr), int64mt_get(&mem_hdr_seqno));
 }
 
 /* gdb(1) convenience */
@@ -430,7 +431,7 @@ void
 mem_arena_dump(void)
 {
     string_t stat_str = mem_stats();
-    write(2, stat_str, strlen(stat_str));
+    size_t ret = ret = write(2, stat_str, strlen(stat_str));
     string_free(stat_str);
 }
 

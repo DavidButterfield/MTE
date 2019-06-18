@@ -41,13 +41,13 @@ export EXTRA_CFLAGS
 
 ############################################################
 
-# MTE_CFLAGS += -DVALGRIND -DARENA_DISABLE    # Enable special program behavior for valgrind
+# MTE_CFLAGS += -DVALGRIND -DARENA_DISABLE=1    # Enable special program behavior for valgrind
 # MTE_CFLAGS += -DNVALGRIND	    # Disable compiling valgrind hooks in program
 
 MTE_CFLAGS += -DDEBUG
 # MTE_CFLAGS += -DNDEBUG
 
-MTE_CFLAGS += -fsanitize=undefined
+# MTE_CFLAGS += -fsanitize=undefined
 # MTE_CFLAGS += -DTRACE_TRACE
 # MTE_CFLAGS += -DTRACE_VERBOSE
 

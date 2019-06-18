@@ -54,6 +54,7 @@ BUF_alloc(sys_buf_cache_t const cache, sstring_t whence)
 static sys_buf_t
 BUF_zalloc(sys_buf_cache_t const cache, sstring_t whence)
 {
+    assert(cache != NULL, "from %s", whence);
     sys_buf_t const ret = mem_cache_alloc((mem_cache_t)cache);
     mem_buf_allocator_set(ret, whence);
     trace_tooverbose("ZALLOC %p length %u by %s", ret, ((mem_cache_t)cache)->buf_size, whence);

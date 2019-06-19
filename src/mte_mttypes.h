@@ -30,7 +30,8 @@
 
 /* For inclusion in spin-wait loops to improve CPU behavior */
 #ifdef NVALGRIND
-  #define SYS_SPINWAITING()	(__builtin_ia32_pause(), true)
+  extern bool _MTE_gcc_junk;	/* avoid gcc warning */
+  #define SYS_SPINWAITING()	(__builtin_ia32_pause(), _MTE_gcc_junk = true)
 #else
   //XXX F3 90 CPU spinloop hint seems to confuse valgrind (though possibly it's exposing a race)
 
@@ -490,7 +491,8 @@ sys_fifo_deinit(sys_fifo_t * const fifo)
 #if DEBUG
     sys_spin_lock(&fifo->lock);
     sys_fifo_check_locked(fifo);
-    expect(sys_fifo_is_empty(fifo), "fifo={"SYS_FIFO_FMT"}", SYS_FIFO_FIELDS(fifo));
+    bool ok = sys_fifo_is_empty(fifo);
+    expect(ok, "NON-EMPTY: fifo={"SYS_FIFO_FMT"}", SYS_FIFO_FIELDS(fifo));
     memset(fifo, 0xb9, sizeof(*fifo));
 #endif
 }
@@ -1053,7 +1055,8 @@ sys_freelist_check(sys_freelist_t * const fl)
 }
 
 static inline void
-sys_freelist_init(sys_freelist_t * const fl, /*count_t const nhoard, count_t const*/ count_t hoard_limit)
+sys_freelist_init(sys_freelist_t * const fl,
+		  /*count_t const nhoard, count_t const*/ count_t hoard_limit)
 {
     count_t const nhoard = MAX_HOARDS;
 
@@ -1070,11 +1073,14 @@ static inline void
 sys_freelist_deinit(sys_freelist_t * const fl)
 {
     sys_freelist_check(fl);
-    assert(sys_fifo_is_empty(&fl->common));
+    bool ok = sys_fifo_is_empty(&fl->common);
+    assert(ok, "NON-EMPTY: fifo={"SYS_FIFO_FMT"}", SYS_FIFO_FIELDS(&fl->common));
 
     idx_t hoardn;
     for (hoardn = 0; hoardn < fl->nhoard; hoardn++) {
-	assert(sys_fifo_is_empty(&fl->hoard[hoardn].hoard));
+	ok = sys_fifo_is_empty(&fl->hoard[hoardn].hoard);
+	assert(ok, "NON-EMPTY: fifo={"SYS_FIFO_FMT"}",
+			SYS_FIFO_FIELDS(&fl->hoard[hoardn].hoard));
     }
 
     memset(fl, 0xb9, sizeof(*fl));

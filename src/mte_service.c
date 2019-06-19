@@ -280,7 +280,8 @@ SYS_init(sys_service_cfg_t const v_cfg)
     err = pthread_getname_np(pthread_self(), sys_pthread_name, sizeof(sys_pthread_name));
     expect_noerr(err, "pthread_getname_np");
     if (!sys_pthread_name[0]) {
-	strncpy(sys_pthread_name, "SYS_init_thread", sizeof(sys_pthread_name)-1);
+	strncpy(sys_pthread_name, "SYS_init_thread", sizeof(sys_pthread_name));
+	sys_pthread_name[sizeof(sys_pthread_name)-1] = '\0';
     }
 
     /* First set up the thread (neither name nor thread are deallocated for this thread) */

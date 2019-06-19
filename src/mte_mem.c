@@ -16,12 +16,14 @@ int64mt_t mem_hdr_seqno; /* debugging observability -- sequence number for alloc
 
 /***** Memory allocation header -- keeps refcount, stat, and diagnostic information *****/
 
+#if !ARENA_DISABLE
 void
 _mem_buf_allocator_set(void * buf, sstring_t caller_id)
 {
     mem_hdr_t const hdr = mem_hdr_of_buf(buf);
     hdr->alloc_caller = caller_id;
 }
+#endif
 
 /* Allocate a NEW aligned buffer and its header FROM THE BACKING ALLOCATOR --
  * the header is initialized to free-state; the buffer itself remains UNinitialized

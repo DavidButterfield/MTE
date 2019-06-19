@@ -2,69 +2,73 @@
 # Copyright 2016 David A. Butterfield
 # Makefile for the Multithreaded Engine
 
+# MY_CFLAGS += -DVALGRIND -DARENA_DISABLE=1	# Enable special program behavior for valgrind
+# MY_CFLAGS += -DNVALGRIND			# Disable compiling valgrind hooks in program
+
+MY_CFLAGS += -DDEBUG
+MY_CFLAGS += -fsanitize=undefined
+# MY_CFLAGS += -DNDEBUG
+
+# MY_CFLAGS += -DTRACE_TRACE
+# MY_CFLAGS += -DTRACE_VERBOSE
+
+# MY_CFLAGS += -O0
+MY_CFLAGS += -Og
+# MY_CFLAGS += -O1
+# MY_CFLAGS += -O2
+# MY_CFLAGS += -O3
+# MY_CFLAGS += -DOPTIMIZED	# disable most of the memory checks remaining when !DEBUG
+
 ####################  Enable most compiler warnings  ####################
 
+# Warnings enabled by a real kernel build
 WFLAGS_WARN += -Wall
-WFLAGS_WARN += -Wextra
-WFLAGS_WARN += -Wundef
-WFLAGS_WARN += -Winit-self
+WFLAGS_WARN += -Wmissing-prototypes
 WFLAGS_WARN += -Wstrict-prototypes
-WFLAGS_WARN += -Wlogical-op
+WFLAGS_WARN += -Wundef
+
+# Warnings passed by MTE
+WFLAGS_WARN += -Wextra
 WFLAGS_WARN += -Wjump-misses-init
+WFLAGS_WARN += -Wlogical-op
 WFLAGS_WARN += -Wcast-align
 WFLAGS_WARN += -Wold-style-definition 
-WFLAGS_WARN += -Wredundant-decls
-# WFLAGS_WARN += -Wbad-function-cast
-WFLAGS_WARN += -Wmissing-declarations
-WFLAGS_WARN += -Wmissing-prototypes
-WFLAGS_WARN += -Wnested-externs
 WFLAGS_WARN += -Wmissing-include-dirs
+WFLAGS_WARN += -Wfloat-conversion
+WFLAGS_WARN += -Wnested-externs
 WFLAGS_WARN += -Wunsafe-loop-optimizations
-WFLAGS_WARN += -Wcast-qual
-WFLAGS_WARN += -Wformat=2
-WFLAGS_WARN += -Wshadow
-WFLAGS_WARN += -Wswitch-default
-WFLAGS_WARN += -Wswitch-enum
-WFLAGS_WARN += -Wwrite-strings
 
-## too noisy
-# WFLAGS_WARN += -Wpointer-arith
+# More warnings passed by MTE
+WFLAGS_WARN += -Winit-self
+WFLAGS_WARN += -Wmissing-declarations
+WFLAGS_WARN += -Wswitch-enum
+WFLAGS_WARN += -Wredundant-decls
+WFLAGS_WARN += -Wshadow
+WFLAGS_WARN += -Wbad-function-cast
+WFLAGS_WARN += -Wformat=2
+WFLAGS_WARN += -Wstrict-aliasing
+
+## Some of each of these in MTE code
 # WFLAGS_WARN += -Wconversion
 # WFLAGS_WARN += -Wsign-conversion
+# WFLAGS_WARN += -Wpointer-arith
 
-WFLAGS_INHIBIT += -Wno-unused-parameter		# silly
+# More warnings passed by MTE
+WFLAGS_WARN += -Wwrite-strings
+WFLAGS_WARN += -Wswitch-default
+WFLAGS_WARN += -Wcast-qual
+
+# silly
+WFLAGS_INHIBIT += -Wno-unused-parameter
 
 MY_CFLAGS += $(WFLAGS_WARN) $(WFLAGS_INHIBIT)
 
-EXTRA_CFLAGS += $(MY_CFLAGS)
-export EXTRA_CFLAGS
-
 ############################################################
 
-# MTE_CFLAGS += -DVALGRIND -DARENA_DISABLE=1    # Enable special program behavior for valgrind
-# MTE_CFLAGS += -DNVALGRIND	    # Disable compiling valgrind hooks in program
-
-MTE_CFLAGS += -DDEBUG
-# MTE_CFLAGS += -DNDEBUG
-
-# MTE_CFLAGS += -fsanitize=undefined
-# MTE_CFLAGS += -DTRACE_TRACE
-# MTE_CFLAGS += -DTRACE_VERBOSE
-
-MTE_CFLAGS += -Og
-# MTE_CFLAGS += -O1
-# MTE_CFLAGS += -O2
-# MTE_CFLAGS += -O3 -fno-strict-aliasing	#XXX
-# MTE_CFLAGS += -DOPTIMIZED	# disable most of the memory checks remaining when !DEBUG
-
-# If the services and mte headers are not in /usr/include, this is where they are
-EXTRA_INCLUDE =	../include
-
-MTE_CFLAGS += -I$(EXTRA_INCLUDE) $(EXTRA_CFLAGS)
-
-CFLAGS += -ggdb -fPIC -fno-omit-frame-pointer -D_GNU_SOURCE $(MTE_CFLAGS)
-
-############################################################
+MTE_CFLAGS += -ggdb -fPIC -fno-omit-frame-pointer -D_GNU_SOURCE
+MTE_CFLAGS += -I../include
+MTE_CFLAGS += $(MY_CFLAGS)
+MTE_CFLAGS += $(EXTRA_CFLAGS)	    # imported if existing
 
 MTE_LDFLAGS    +=     -d -z now -O 1 -E
 MTE_GCCLDFLAGS += -Wl,-d,-z,now,-O,1,-E
@@ -79,10 +83,9 @@ all: $(LIBS) cscope.out
 install: $(LIBS)
 	$(MAKE) -C . /lib/libmte.so
 	$(MAKE) -C . /lib/libmte.a
-	cp $(EXTRA_INCLUDE)/*.h /usr/include
+	cp ../include/*.h /usr/include
 
 cscope:	cscope.out
-
 
 /lib/libmte.so:	libmte.so
 	cp $< $@
@@ -103,10 +106,10 @@ ifeq (.depend,$(wildcard .depend))
 endif
 
 %.o: %.c Makefile
-	$(CC) -c -o $(@) $(CFLAGS) $(<)
+	$(CC) -c -o $(@) $(MTE_CFLAGS) $(<)
 
 .depend:
-	$(CC) -M $(CFLAGS) $(SRCS_D) >$(@)
+	$(CC) -M $(MTE_CFLAGS) $(SRCS_D) >$(@)
 
 cleanish:
 	rm -f *.o .depend

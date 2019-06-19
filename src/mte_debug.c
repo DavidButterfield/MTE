@@ -18,6 +18,8 @@
 #include "mte_util.h"
 #include "mte_mttypes.h"
 
+bool _MTE_gcc_junk;	/* to avoid compiler warnings */
+
 PER_THREAD uintptr_t sys_stack_end;
 
 /* Determine whether ascii[0] to ascii[7] look like ASCII characters, if so returning a string

@@ -76,7 +76,7 @@ assert_static(sizeof(void *) == 8);
     do {									\
 	if (unlikely((rc) < 0)) {						\
 	    sys_panic("%s failed: %d '%s' "fmt,					\
-	        #call, (int32_t)rc, strerror(rc == -1 ? errno : (int32_t)-rc), ##args); \
+	        #call, (int)rc, strerror(rc == -1 ? errno : (int)-rc), ##args); \
 	}									\
     } while (0)
 
@@ -243,8 +243,8 @@ assert_static(sizeof(void *) == 8);
     do {									\
 	if (unlikely((rc) < 0)) {						\
 	    sys_warning("%s syscall: rc=%d err=%d %s "fmt,			\
-		        #call, (int)rc, rc == -1 ? errno : (int32_t)-rc,	\
-			  strerror(rc == -1 ? errno : -rc), ##args);		\
+		        #call, (int)rc, rc == -1 ? errno : (int)-rc,		\
+			  strerror(rc == -1 ? errno : (int)-rc), ##args);	\
 	}									\
     } while (0)
 

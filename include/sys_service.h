@@ -20,7 +20,7 @@
 #include <execinfo.h>
 #include <sys/syscall.h>
 #define gettid()                        ((pid_t)(syscall(SYS_gettid)))	/* thread-id */
-#define tkill(tid, sig)			(syscall(__NR_tkill, tid, sig)) /* thread signal */
+#define tkill(tid, sig)			(int)(syscall(__NR_tkill, tid, sig)) /* thread signal */
 
 #define __stringify(TOKEN)		__STRINGIFY(TOKEN)
 #define __STRINGIFY(TOKEN)		#TOKEN

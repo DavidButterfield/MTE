@@ -499,10 +499,10 @@ posix_alloc_aligned(llen_t const nbytes, llen_t const align)
 	sys_warning("large allocation of %"PRIu64" bytes\n", nbytes);
 	sys_backtrace("large allocation");
     }
-    void * ptr;
+    void * ptr = NULL;
     int const rc = posix_memalign(&ptr, align, nbytes);
     assert_eq(rc, 0);
-    assert_ptr(ptr);
+    verify_ptr(ptr);
     assert(IS_CACHE_ALIGNED(ptr), "%p", ptr);
     return ASSUME_ALIGNED(ptr, CACHE_ALIGN_BYTES);
 }

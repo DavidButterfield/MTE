@@ -6,7 +6,7 @@
 # MY_CFLAGS += -DNVALGRIND			# Disable compiling valgrind hooks in program
 
 MY_CFLAGS += -DDEBUG
-MY_CFLAGS += -fsanitize=undefined
+# MY_CFLAGS += -fsanitize=undefined
 # MY_CFLAGS += -DNDEBUG
 
 # MY_CFLAGS += -DTRACE_TRACE
@@ -19,7 +19,7 @@ MY_CFLAGS += -Og
 # MY_CFLAGS += -O3
 # MY_CFLAGS += -DOPTIMIZED	# disable most of the memory checks remaining when !DEBUG
 
-####################  Enable most compiler warnings  ####################
+#######################  Enable most compiler warnings  #######################
 
 # Warnings enabled by a real kernel build
 WFLAGS_WARN += -Wall
@@ -35,17 +35,16 @@ WFLAGS_WARN += -Wcast-align
 WFLAGS_WARN += -Wold-style-definition 
 WFLAGS_WARN += -Wmissing-include-dirs
 WFLAGS_WARN += -Wfloat-conversion
+WFLAGS_WARN += -Wmissing-declarations
 WFLAGS_WARN += -Wnested-externs
 WFLAGS_WARN += -Wunsafe-loop-optimizations
 
-# More warnings passed by MTE
 WFLAGS_WARN += -Winit-self
-WFLAGS_WARN += -Wmissing-declarations
 WFLAGS_WARN += -Wswitch-enum
 WFLAGS_WARN += -Wredundant-decls
-WFLAGS_WARN += -Wshadow
-WFLAGS_WARN += -Wbad-function-cast
 WFLAGS_WARN += -Wformat=2
+
+# This only warns if -fstrict-aliasing is enabled (e.g. by -O2), in which case the warning is important
 WFLAGS_WARN += -Wstrict-aliasing
 
 ## Some of each of these in MTE code
@@ -57,13 +56,15 @@ WFLAGS_WARN += -Wstrict-aliasing
 WFLAGS_WARN += -Wwrite-strings
 WFLAGS_WARN += -Wswitch-default
 WFLAGS_WARN += -Wcast-qual
+WFLAGS_WARN += -Wbad-function-cast			# 1 in linux/kernel.h when compiling SCST/DRBD
+WFLAGS_WARN += -Wshadow					# kernel.h, bitops.h when compiling SCST/DRBD
 
-# silly
+### silly
 WFLAGS_INHIBIT += -Wno-unused-parameter
 
 MY_CFLAGS += $(WFLAGS_WARN) $(WFLAGS_INHIBIT)
 
-############################################################
+###############################################################################
 
 MTE_CFLAGS += -ggdb -fPIC -fno-omit-frame-pointer -D_GNU_SOURCE
 MTE_CFLAGS += -I../include

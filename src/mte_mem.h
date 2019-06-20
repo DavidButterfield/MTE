@@ -76,15 +76,27 @@ void mem_init(void);
 #if ARENA_DISABLE		/* Only true for special testing */
 				/* (in which case mem_hold isn't quite right) */
 
-#define mem_alloc(size_req)			mem_zero(mem_alloc_uninit(size_req), (size_req))
-#define mem_alloc_callerid(size_req, id)	mem_zero(mem_alloc_uninit(size_req), (size_req))
-#define mem_realloc_callerid(oaddr, nsize, whence)  posix_realloc((oaddr), (nsize))
-#define mem_alloc_uninit(size_req)		posix_alloc(size_req)
-#define mem_alloc_uninit_callerid(size_req, id)	posix_alloc(size_req)
 #define mem_free(buf, size_req)			posix_free((buf), (size_req))
-#define mem_free_callerid(buf, size_req, id)	posix_free((buf), (size_req))
 #define mem_drop(buf)				posix_drop(buf)
-#define mem_drop_callerid(buf, id)		posix_drop(buf)
+#define mem_alloc(size_req)			mem_zero(mem_alloc_uninit(size_req), (size_req))
+static inline void *
+mem_alloc_uninit(size_t nbytes)
+{
+    size_t size_align = nbytes >= PAGE_ALIGN_BYTES ? PAGE_ALIGN_BYTES :
+			nbytes >= SECTOR_ALIGN_BYTES ? SECTOR_ALIGN_BYTES :
+			CACHE_ALIGN_BYTES;
+    void * ptr = NULL;
+    int const rc = posix_memalign(&ptr, size_align, nbytes);
+    assert_eq(rc, 0);
+    return ptr;
+}
+
+#define mem_free_callerid(buf, size_req, id)	mem_free(buf, size_req)
+#define mem_drop_callerid(buf, id)		mem_drop(buf)
+#define mem_alloc_callerid(size_req, id)	mem_alloc(size_req)
+#define mem_alloc_uninit_callerid(size_req, id)	mem_alloc_uninit(size_req)
+
+#define mem_realloc_callerid(oaddr, nsize, id)	posix_realloc((oaddr), (nsize))
 
 #define mem_check(buf)				do { } while (0)
 #define mem_fmt(buf)				do { } while (0)

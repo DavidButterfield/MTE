@@ -103,7 +103,6 @@ mem_alloc_uninit(size_t nbytes)
 #define mem_stats()				sstring_copy("No mem_stats with ARENA_DISABLE")
 #define mem_bounds_check(buf, ofs, nbytes)	do { } while (0)
 #define mem_cache_alloc_uninit(cache)		mem_alloc_uninit((cache)->buf_size)
-#define mem_buf_allocator_set(buf, whence)	do { } while (0)
 
 #define mem_hold(buf) sys_panic("cannot hold buffer %p when arenas are disabled", buf);
 
@@ -171,11 +170,11 @@ mem_alloc_uninit(size_t nbytes)
 		mem_hdr_to_buf(_mem_cache_alloc((cache), (cache)->buf_size, FL_STR)), \
 	        MEM_ALIGN_MIN)
 
+#endif
+
 /* Attribute the allocation to a static caller_id string */
 extern void _mem_buf_allocator_set(void * buf, sstring_t caller_id);
 #define mem_buf_allocator_set(buf, caller_id) _mem_buf_allocator_set((buf), (caller_id))
-
-#endif
 
 /* These definitions are generic, not bindings to any particular allocator implementation */
 

@@ -268,7 +268,7 @@ event_poll_deliver(struct epoll_event const * const events, uint32_t const neven
  */
 sys_poll_entry_t
 mte_poll_enable(sys_event_task_t event_task, void (*fn)(void *, uintptr_t, errno_t),
-		void * env, int fd, unsigned long events, string_t name)
+		void * env, int fd, unsigned long events, sstring_t name)
 {
     assert(events);
     sys_poll_entry_t pe = mem_cache_alloc(MTE_poll_cache);

@@ -380,7 +380,7 @@ mte_backtrace(sstring_t const reason)
 #define DUMP_PER_ROW_MAX 8
 void
 mem_dump_stack(uintptr_t const start, uintptr_t const end, uintptr_t const SP,
-				      uintptr_t const BP, string_t const reason)
+				      uintptr_t const BP, sstring_t const reason)
 {
     /* Maybe expand the range slightly to start and end on cache-line boundaries */
     uintptr_t const round_start = ROUNDDOWN(start, CACHE_ALIGN_BYTES);
@@ -466,7 +466,7 @@ mem_dump_stack(uintptr_t const start, uintptr_t const end, uintptr_t const SP,
 }
 
 void
-mem_dump(uintptr_t const start, uintptr_t const end, string_t const reason)
+mem_dump(uintptr_t const start, uintptr_t const end, sstring_t const reason)
 {
     mem_dump_stack(start, end, 0, 0, reason);
 }
@@ -744,7 +744,7 @@ static sys_spinlock_t sys_abort_lock;	/* avoid mixing dump output from multiple 
 /* Dump out diagnostic information after a signal */
 void
 sys_signal_dump(int const signum, siginfo_t * const siginfo, ucontext_t * const ucontext,
-								string_t const whence)
+								sstring_t const whence)
 {
     expect_eq(signum, siginfo->si_signo);
 

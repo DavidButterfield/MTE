@@ -57,6 +57,10 @@
   #define valgrind_backtrace(f, a...)	do { } while (0)
 #endif
 
+#define PREDICT(e, p)			__builtin_expect((long)(e), (long)(p))
+#define likely(e)			PREDICT((e) != 0, true)
+#define unlikely(e)			PREDICT((e) != 0, false)
+
 /* Optimizer hints */
 #define always_inline			inline __attribute__((__always_inline__))
 #define NORETURN			__attribute__((__noreturn__))
@@ -97,7 +101,7 @@ unconstify(void const * cvp)
 typedef int				sys_rc_t;	    /* return code from syscalls */
 #define SYS_RC_OK			0
 
-typedef const char                    * string_t;           /* owned dynamic string */
+typedef char			      * string_t;           /* owned dynamic string */
 typedef const char                    * sstring_t;          /* unowned or static string */
 
 typedef int                             errno_t;            /* errno (or -errno) */
@@ -178,5 +182,11 @@ static inline uint64_t ROUNDDOWN(uint64_t const v, uint64_t const q) { return (v
 #define assert_this_thread_is_not(thread)	__USE(thread)
 
 #endif
+
+extern int sys_eventfd_create(sstring_t const name);
+extern int sys_eventfd_create_sem(sstring_t const name);
+extern void sys_eventfd_close(int const fd);
+extern uint64_t sys_eventfd_read(int const eventfd);
+extern void sys_eventfd_write(int const fd, uint64_t const count);
 
 #endif /* MTE_DEFINES_H */

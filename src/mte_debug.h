@@ -1,4 +1,4 @@
-/* sys_debug.h
+/* mte_debug.h
  * Copyright 2015 David A. Butterfield
  * High-Performance Multithreaded Event Engine
  *
@@ -13,8 +13,8 @@
  *	UNSIGNED:   _b	    _be,    _ae,    _a		("below", "above")
  *
  */
-#ifndef SYS_DEBUG_H
-#define SYS_DEBUG_H
+#ifndef MTE_DEBUG_H
+#define MTE_DEBUG_H
 #include <signal.h>
 
 #include "sys_service.h"
@@ -443,7 +443,7 @@ assert_static(sizeof(void *) == 8);
  * the prefix string is consumed and a pointer to the result string is returned */
 //XXXX TUNE optimize sys_sprintf_append
 #define sys_sprintf_append(str, fmt, args...) ({				\
-	    string_t nstr = sys_sprintf("%s"fmt, (str) ? : "", ##args);		\
+	    char * nstr = sys_sprintf("%s"fmt, (str) ? : "", ##args);		\
 	    if (str) string_free(str);						\
 	    nstr; })
 
@@ -537,7 +537,7 @@ static inline void trace_enable_verbose(int const _flag) { _trace_enabled_verbos
 extern uint32_t sys_backtrace_get_max(void * bt[], uint32_t const stackframes_max);
 
 /* Format a previously-taken backtrace snapshot into an engineer-readable string */
-extern sstring_t sys_backtrace_fmt(void * bt[], uint32_t const nframes);
+extern char * sys_backtrace_fmt(void * bt[], uint32_t const nframes);
 
 /* Format and dump a previously-taken backtrace snapshot */
 extern void sys_backtrace_dump(void * bt[], uint32_t const nframes);
@@ -571,4 +571,4 @@ extern sstring_t sys_symbol_stack_ref(uintptr_t const addr, uintptr_t const SP, 
 #define _sys_panic_err(err, fmt, args...) \
 	    _sys_panic("errno=%u (%s) "fmt, err, strerror(err), ##args)
 
-#endif /* SYS_DEBUG_H */
+#endif /* MTE_DEBUG_H */

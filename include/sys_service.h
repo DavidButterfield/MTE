@@ -19,23 +19,8 @@
 #include <sys/epoll.h>
 #include <execinfo.h>
 #include <sys/syscall.h>
-#define gettid()                        ((pid_t)(syscall(SYS_gettid)))	/* thread-id */
-#define tkill(tid, sig)			(int)(syscall(__NR_tkill, tid, sig)) /* thread signal */
 
-#define __stringify(TOKEN)		__STRINGIFY(TOKEN)
-#define __STRINGIFY(TOKEN)		#TOKEN
-
-#define FL_STR                          __FILE__":"__stringify(__LINE__)
-
-#define PREDICT(e, p)			__builtin_expect((long)(e), (long)(p))
-#define likely(e)			PREDICT((e) != 0, true)
-#define unlikely(e)			PREDICT((e) != 0, false)
-
-typedef const char		      * string_t;	    /* owned dynamic string */
 typedef const char		      * sstring_t;	    /* unowned or static string */
-
-typedef int				errno_t;	    /* errno (or -errno) */
-#define E_OK				0		    /* no error */
 
 typedef uint64_t			sys_time_t;	    /* monotonically-increasing time */
 typedef uint64_t			sys_time_delta_t;   /* time interval in ns */
@@ -62,8 +47,8 @@ typedef struct sys_event_task_cfg {
 struct sys_service_handle {
     void	        * env;		/* system service Implementor private */
     struct sys_service_ops {
-	errno_t	        (*SS_init)(sys_service_cfg_t);
-	errno_t	        (*SS_fini)(void);
+	error_t	        (*SS_init)(sys_service_cfg_t);
+	error_t	        (*SS_fini)(void);
 	void	        (*SS_dump)(sstring_t reason);
 	void	        (*SS_backtrace)(sstring_t reason);
 	void __attribute__((__noreturn__))
@@ -80,7 +65,7 @@ struct sys_service_handle {
 	/* Buffer cache ops and refcounted buffer ops */
 	sys_buf_cache_t	(*SS_buf_cache_create)(sstring_t name, size_t, size_t align);
 
-	errno_t		(*BUF_cache_destroy)(sys_buf_cache_t);
+	error_t		(*BUF_cache_destroy)(sys_buf_cache_t);
 	sys_buf_t	(*BUF_alloc)(sys_buf_cache_t, sstring_t whence);
 	sys_buf_t	(*BUF_zalloc)(sys_buf_cache_t, sstring_t whence);
 
@@ -89,48 +74,48 @@ struct sys_service_handle {
 	void		(*BUF_check)(sys_buf_t);
 
 	/* Thread ops */
-	sys_thread_t    (*SS_thread_alloc)(errno_t (*fn)(void *), void * env, string_t name);
+	sys_thread_t    (*SS_thread_alloc)(error_t (*fn)(void *), void * env, char * name);
 
-	errno_t		(*THREAD_start)(sys_thread_t);
-	void		(*THREAD_exit)(int rc) __attribute__((__noreturn__));
+	error_t		(*THREAD_start)(sys_thread_t);
+	void		(*THREAD_exit)(long rc) __attribute__((__noreturn__));
 	void		(*THREAD_free)(sys_thread_t);	/* not to be called from on-thread */
 
 	/* Event thread ops */
 	sys_event_task_t   (*SS_etask_alloc)(struct sys_event_task_cfg *);
 
-	string_t	(*ETASK_fmt)(sys_event_task_t);	/* freeable status/stats string */
-	errno_t	        (*ETASK_run)(sys_event_task_t);
-	errno_t	        (*ETASK_stop)(sys_event_task_t);
-	errno_t	        (*ETASK_free)(sys_event_task_t);
+	char *		(*ETASK_fmt)(sys_event_task_t);	/* freeable status/stats string */
+	error_t	        (*ETASK_run)(sys_event_task_t);
+	error_t	        (*ETASK_stop)(sys_event_task_t);
+	error_t	        (*ETASK_free)(sys_event_task_t);
 
 	/* Polls, alarms, and scheduled callbacks:  upon return from its delivery handler (fn),
 	 * an entry becomes invalid, but its handle may still be passed to the appropriate
 	 * cancel function where the cancel/deliver race is detected.  Cancel function returns
-	 * E_OK if entry found and removed, EINVAL if entry not found (presumably delivered).
+	 * 0 if entry found and removed, EINVAL if entry not found (presumably delivered).
 	 */
 	sys_poll_entry_t (*ETASK_poll_enable)(sys_event_task_t,
-			    void (*fn)(void *, uintptr_t, errno_t), void * env,
+			    void (*fn)(void *, uintptr_t, error_t), void * env,
 			    int fd, unsigned long events, sstring_t name);
 
 	void		(*ETASK_poll_disable_sync)(sys_event_task_t, sys_poll_entry_t);
 
 	sys_alarm_entry_t (*ETASK_alarm_set)(sys_event_task_t,
-			    void (*)(void *, uintptr_t, errno_t), void *,
+			    void (*)(void *, uintptr_t, error_t), void *,
 			    sys_time_t, sstring_t name);
 
-	errno_t (*ETASK_alarm_cancel_sync)(sys_event_task_t, sys_alarm_entry_t);
+	error_t (*ETASK_alarm_cancel_sync)(sys_event_task_t, sys_alarm_entry_t);
 
 	sys_sched_entry_t (*ETASK_callback_schedule)(sys_event_task_t,
-			    void (*cb_fn)(void * env, uintptr_t arg, errno_t),
-			    void * cb_env, uintptr_t cb_arg, errno_t, sstring_t name);
+			    void (*cb_fn)(void * env, uintptr_t arg, error_t),
+			    void * cb_env, uintptr_t cb_arg, error_t, sstring_t name);
 
-	errno_t (*ETASK_callback_cancel_sync)(sys_event_task_t, sys_sched_entry_t);
+	error_t (*ETASK_callback_cancel_sync)(sys_event_task_t, sys_sched_entry_t);
 
 	sys_sched_entry_t (*ETASK_callback_schedule_lopri)(sys_event_task_t,
-			    void (*cb_fn)(void * env, uintptr_t arg, errno_t),
-			    void * cb_env, uintptr_t cb_arg, errno_t, sstring_t name);
+			    void (*cb_fn)(void * env, uintptr_t arg, error_t),
+			    void * cb_env, uintptr_t cb_arg, error_t, sstring_t name);
 
-	errno_t (*ETASK_callback_cancel_lopri_sync)(sys_event_task_t, sys_sched_entry_t);
+	error_t (*ETASK_callback_cancel_lopri_sync)(sys_event_task_t, sys_sched_entry_t);
     } op;
 };
 
@@ -142,12 +127,23 @@ extern sys_service_handle_t		SYS_SERVICE;
 
 /* System Services */
 
-#define sys_service_init(CFG) (SYS_SERVICE->op.SS_init ? SYS_SERVICE->op.SS_init(CFG) : E_OK)
-#define sys_service_fini()    (SYS_SERVICE->op.SS_fini ? SYS_SERVICE->op.SS_fini()    : E_OK)
+#define sys_service_init(CFG) (SYS_SERVICE->op.SS_init ? SYS_SERVICE->op.SS_init(CFG) : 0)
+#define sys_service_fini()    (SYS_SERVICE->op.SS_fini ? SYS_SERVICE->op.SS_fini()    : 0)
 
 #define sys_dump(reason)		(SYS_SERVICE->op.SS_dump(reason))
-#define sys_backtrace(reason)		(SYS_SERVICE->op.SS_backtrace(reason))
 #define sys_abort()			(SYS_SERVICE->op.SS_abort())
+
+#define sys_backtrace(fmtargs...) _sys_backtrace(""fmtargs)
+#define _sys_backtrace(fmt, args...) \
+do { \
+    char * _str; \
+    int _ret = asprintf(&_str, fmt, ##args); \
+    if (_ret < 0) \
+	_str = NULL; \
+    SYS_SERVICE->op.SS_backtrace(_str); \
+    if (_str) \
+	free(_str); \
+} while (0)
 
 /* Memory */
 
@@ -157,11 +153,6 @@ extern sys_service_handle_t		SYS_SERVICE;
 #define sys_mem_free(BUF)		(SYS_SERVICE->op.SS_mem_free(    (BUF),	      FL_STR  ))
 
 #define sys_mem_dup(addr, len)		memcpy(sys_mem_alloc(len), (addr), (len))
-
-#define record_alloc_uninit(ptr_var)	((typeof(ptr_var))sys_mem_alloc(sizeof(*(ptr_var))))
-#define record_alloc(ptr_var)		((typeof(ptr_var))sys_mem_zalloc(sizeof(*(ptr_var))))
-#define record_free(ptr_var)		sys_mem_free(ptr_var)
-#define record_zero(ptr_var)		memset((ptr_var), 0, sizeof(*(ptr_var)))
 
 #define sys_buf_cache_create(NM, SIZE, ALIGN) \
 					(SYS_SERVICE->op.SS_buf_cache_create((NM), (SIZE), (ALIGN) ))
@@ -222,10 +213,11 @@ extern sys_service_handle_t		SYS_SERVICE;
 #define sys_thread_start(THREAD)	(SYS_SERVICE->op.THREAD_start(THREAD))
 #define sys_thread_free(THREAD)		(SYS_SERVICE->op.THREAD_free(THREAD))
 
+//XXX Should take a long argument
 static inline void __attribute__((__noreturn__))
-sys_thread_exit(int rc)
+sys_thread_exit(long rc)
 {
-    void (*THREAD_exit)(int) __attribute__((__noreturn__)) = SYS_SERVICE->op.THREAD_exit;
+    void (*THREAD_exit)(long) __attribute__((__noreturn__)) = SYS_SERVICE->op.THREAD_exit;
     THREAD_exit(rc);
 }
 
@@ -286,10 +278,11 @@ sys_thread_exit(int rc)
 
 /*** sys_threads ***/
 
+//XXX should move to .c file -- treat as opaque
 typedef struct sys_thread {
     void		  * run_env;	    /* argument to run_fn */
-    errno_t		  (*run_fn)(void *);/* thread's work function */
-    string_t		    name;	    /* owned string */
+    error_t		  (*run_fn)(void *);/* thread's work function */
+    char *		    name;	    /* owned string */
     pthread_t	            pthread_id;	    /* posix thread_id */
     sys_time_t		    dob;	    /* thread creation time */
     pid_t	            tid;	    /* thread ID */
@@ -311,12 +304,13 @@ extern __thread sys_thread_t	sys_thread;
 #define sys_event_task_current()	sys_event_task
 extern __thread sys_event_task_t	sys_event_task;
 
-//XXXXXX mte guts need abstracting or something
+/******************************************************************************/
+
+//XXXX ADD sys_buf_allocator_set() to the sys_services API
+extern void _mem_buf_allocator_set(void * buf, const char * caller_id);
+#define sys_buf_allocator_set(buf, caller_id) _mem_buf_allocator_set((buf), (caller_id))
+
+//XXXX ADD mte_signal_handler_set() to the sys_services API
 extern int mte_signal_handler_set(uint32_t signum, void (*handler)(uint32_t)); //XXXX
-extern int sys_eventfd_create(sstring_t const name);
-extern int sys_eventfd_create_sem(sstring_t const name);
-extern void sys_eventfd_close(int const fd);
-extern uint64_t sys_eventfd_read(int const eventfd);
-extern void sys_eventfd_write(int const fd, uint64_t const count);
 
 #endif /* SYS_SERVICE_H */

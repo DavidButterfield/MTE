@@ -41,14 +41,14 @@ typedef void * aio_service_cfg_t;	/* Implementor-specific */
 struct aio_handle {
     void	     * env;		/* Implementor per-open-file private */
     struct aio_ops {
-	errno_t	(*readv_start) (aio_handle_t,
-				   void *, void (*fn)(void *, uintptr_t, errno_t), void * env,
+	error_t	(*readv_start) (aio_handle_t,
+				   void *, void (*fn)(void *, uintptr_t, error_t), void * env,
 				   uint64_t, size_t,  uint32_t, struct iovec *);
-	errno_t	(*writev_start)(aio_handle_t,
-				   void *, void (*fn)(void *, uintptr_t, errno_t), void * env,
+	error_t	(*writev_start)(aio_handle_t,
+				   void *, void (*fn)(void *, uintptr_t, error_t), void * env,
 			           uint64_t, size_t,  uint32_t, struct iovec *);
-	errno_t	(*sync_start)     (aio_handle_t,
-				   void *, void (*fn)(void *, uintptr_t, errno_t), void * env);
+	error_t	(*sync_start)     (aio_handle_t,
+				   void *, void (*fn)(void *, uintptr_t, error_t), void * env);
 	void	(*close)          (aio_handle_t);
 	char const * (*fmt)	  (aio_handle_t);   /* caller to free using sys_mem_free */
     } op;
@@ -70,8 +70,8 @@ struct aio_service_handle {
     void	      * env;		    /* AIO service Implementor private */
     uint32_t		op_private_bytes;   /* Space requested for AIO per-op private area */
     struct aio_service_ops {
-	errno_t	      (*init) (aio_service_handle_t, void const *);
-	errno_t	      (*fini) (aio_service_handle_t);
+	error_t	      (*init) (aio_service_handle_t, void const *);
+	error_t	      (*fini) (aio_service_handle_t);
 	void	      (*dump) (aio_service_handle_t);
 	aio_handle_t  (*open) (aio_service_handle_t, char const * path, int ro, uint64_t *);
 	aio_handle_t  (*fopen)(aio_service_handle_t, int fd, uint64_t *, char const * logname);

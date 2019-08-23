@@ -173,7 +173,6 @@ mem_alloc_uninit(size_t nbytes)
 #endif
 
 /* Attribute the allocation to a static caller_id string */
-extern void _mem_buf_allocator_set(void * buf, sstring_t caller_id);
 #define mem_buf_allocator_set(buf, caller_id) _mem_buf_allocator_set((buf), (caller_id))
 
 /* These definitions are generic, not bindings to any particular allocator implementation */

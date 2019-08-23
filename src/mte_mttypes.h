@@ -11,7 +11,7 @@
 #include <sched.h>
 
 #include "mte_defines.h"
-#include "sys_debug.h"
+#include "mte_debug.h"
 
 #ifndef TRACE_STATS
 #define TRACE_STATS true

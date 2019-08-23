@@ -207,11 +207,11 @@ THREAD_free(sys_thread_t thread)
 
 /* Called on the exiting thread -- exclusive with THREAD_free for a given thread */
 static void NORETURN
-THREAD_exit(int rc)
+THREAD_exit(long rc)
 {
     expect_eq(sys_thread->tid, gettid());
     expect_eq(sys_thread->pthread_id, pthread_self());
-    trace("Thread '%s' tid=%u called sys_thread_exit(%d)\n",
+    trace("Thread '%s' tid=%u called sys_thread_exit(%ld)\n",
 	  sys_thread->name, sys_thread->tid, rc);
 
     if (sys_thread != &MTE_main_thread_space) {

@@ -11,7 +11,7 @@
 #include <sys/resource.h>
 
 #include "sys_service.h"		/* memory, timers, threads, etc */
-#include "sys_debug.h"
+#include "mte_debug.h"
 #include "mte_defines.h"
 
 /* mte_debug.c */

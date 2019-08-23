@@ -687,7 +687,7 @@ mem_buf_size_inuse(void const * const buf)
 }
 
 /* Declare a memory header or buffer area to be corrupted (panics) */
-sstring_t NORETURN mem_hdr_corrupt(mem_hdr_t const hdr, buf_t buf, string_t const info);
+sstring_t NORETURN mem_hdr_corrupt(mem_hdr_t const hdr, buf_t buf, sstring_t const info);
 
 /* Check a mem_hdr_t */
 static always_inline void

@@ -31,10 +31,11 @@
 #define expect_noerr(err, fmtargs...)	    _expect_noerr((err), ""fmtargs)
 #define expect_rc(rc, call, fmtargs...)	    _expect_rc((rc), call, ""fmtargs)
 #else
-#define expect_rel(x, op, y, fmtargs...)    ( _USE(x), _USE(y) )
-#define expect_imply(x, y, fmtargs...)	    ( _USE(x), _USE(y) )
-#define expect_noerr(err, fmtargs...)	    _USE(err)
-#define expect_rc(rc, call, fmtargs...)	    _USE(rc)
+int compiler_silence;
+#define expect_rel(x, op, y, fmtargs...)    ( _USE(x), _USE(y), compiler_silence=true )
+#define expect_imply(x, y, fmtargs...)	    ( _USE(x), _USE(y), compiler_silence=true )
+#define expect_noerr(err, fmtargs...)	    ( _USE(err), compiler_silence=true )
+#define expect_rc(rc, call, fmtargs...)	    ( _USE(rc), compiler_silence=true )
 #endif
 
 /* Enabled when -DDEBUG:  assert*(), expect*(), verify*(), _expect*() */

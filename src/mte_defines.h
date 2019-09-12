@@ -49,7 +49,7 @@
 #define FL_STR                          __FILE__":"__stringify(__LINE__)
 
 #ifndef NVALGRIND
-  #include "valgrind.h"
+  #include "valgrind/valgrind.h"
   #define valgrind_is_active()          (RUNNING_ON_VALGRIND)
   #define valgrind_backtrace(f, a...)	(VALGRIND_PRINTF_BACKTRACE(f, ##a))
 #else
